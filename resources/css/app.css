@@ -1,0 +1,31 @@
+/**
+ * app.css
+ * Estilos customizados da aplicação
+ */
+
+/* Garantir compatibilidade com toggles de senha */
+.password-toggle,
+.password-toggle-user {
+  cursor: pointer;
+  user-select: none;
+}
+
+.password-toggle:hover,
+.password-toggle-user:hover {
+  opacity: 0.7;
+}
+
+/* Melhorar feedback visual dos indicadores */
+.is-valid ~ .password-strength,
+.is-valid ~ .password-match-feedback {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

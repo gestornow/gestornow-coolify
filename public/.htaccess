@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always setifempty Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always setifempty Content-Security-Policy "default-src 'self' https: data: blob: 'unsafe-inline' 'unsafe-eval'; base-uri 'self'; frame-ancestors 'self'; object-src 'none';"
+    Header always setifempty X-Frame-Options "SAMEORIGIN"
+    Header always setifempty X-Content-Type-Options "nosniff"
+    Header always setifempty Referrer-Policy "strict-origin-when-cross-origin"
+    Header always setifempty Permissions-Policy "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+</IfModule>

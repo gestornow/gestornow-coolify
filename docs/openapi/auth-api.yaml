@@ -1,0 +1,326 @@
+openapi: 3.0.1
+info:
+  title: GestorNow Auth API
+  description: API de autenticação para app Flutter (login, registro, recuperação de senha, logout, me)
+  version: 1.0.0
+servers:
+  - url: https://{host}/api/auth
+    variables:
+      host:
+        default: localhost
+paths:
+  /login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /me:
+    get:
+      summary: Retorna o usuário autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '401':
+          description: Não autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /pre-registro:
+    post:
+      summary: Iniciar pré-registro (cria empresa + usuário e envia email de validação)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreRegistroRequest'
+      responses:
+        '201':
+          description: Pré-registro criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreRegistroResponse'
+        '422':
+          $ref: '#/components/schemas/ErrorResponse'
+  /finalizar-registro:
+    post:
+      summary: Finalizar registro (definir senha)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FinalizarRegistroRequest'
+      responses:
+        '200':
+          description: Registro finalizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinalizarRegistroResponse'
+        '422':
+          $ref: '#/components/schemas/ErrorResponse'
+  /reset/enviar-codigo:
+    post:
+      summary: Iniciar recuperação de senha (enviar código)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Código enviado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResult'
+        '422':
+          $ref: '#/components/schemas/ErrorResponse'
+  /reset/validar-codigo:
+    post:
+      summary: Validar código de reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  format: email
+                codigo:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+      responses:
+        '200':
+          description: Código válido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResult'
+        '422':
+          $ref: '#/components/schemas/ErrorResponse'
+  /reset/atualizar-senha:
+    post:
+      summary: Atualizar senha usando token de reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AtualizarSenhaRequest'
+      responses:
+        '200':
+          description: Senha atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResult'
+        '422':
+          $ref: '#/components/schemas/ErrorResponse'
+  /logout:
+    post:
+      summary: Logout (invalidar sessão e opcionalmente revogar api_token)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session_token:
+                  type: string
+                user_id:
+                  type: integer
+                api_token:
+                  type: string
+      responses:
+        '200':
+          description: Logout efetuado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericResult'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      required: [login, senha]
+      properties:
+        login:
+          type: string
+        senha:
+          type: string
+        lembrar:
+          type: boolean
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            usuario:
+              $ref: '#/components/schemas/Usuario'
+            session_token:
+              type: string
+            csrf_token:
+              type: string
+            expires_at:
+              type: string
+            api_token:
+              type: string
+    Usuario:
+      type: object
+      properties:
+        id_usuario:
+          type: integer
+        nome:
+          type: string
+        login:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+        empresa_id:
+          type: integer
+    MeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            usuario:
+              type: object
+              properties:
+                id_usuario:
+                  type: integer
+                nome:
+                  type: string
+                login:
+                  type: string
+                empresa:
+                  type: object
+    PreRegistroRequest:
+      type: object
+      required: [razao_social, cnpj, nome, email]
+      properties:
+        razao_social:
+          type: string
+        cnpj:
+          type: string
+        nome:
+          type: string
+        email:
+          type: string
+    PreRegistroResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            empresa_id:
+              type: integer
+            usuario_id:
+              type: integer
+    FinalizarRegistroRequest:
+      type: object
+      required: [empresa_id, usuario_id, senha, senha_confirmation]
+      properties:
+        empresa_id:
+          type: integer
+        usuario_id:
+          type: integer
+        senha:
+          type: string
+        senha_confirmation:
+          type: string
+    FinalizarRegistroResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            usuario:
+              $ref: '#/components/schemas/Usuario'
+            empresa:
+              type: object
+    AtualizarSenhaRequest:
+      type: object
+      required: [login, token_reset, senha, senha_confirmation]
+      properties:
+        login:
+          type: string
+        token_reset:
+          type: string
+        senha:
+          type: string
+        senha_confirmation:
+          type: string
+    GenericResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        errors:
+          type: object
+          additionalProperties: true

@@ -1,0 +1,282 @@
+@extends('layouts.layoutMaster')
+
+@section('title', 'Locações Pendentes de Faturamento')
+
+@section('content')
+<div class="container-xxl flex-grow-1">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1">Locações Pendentes de Faturamento</h4>
+                    <p class="text-muted mb-0">Locações com status 'Aprovado' ou 'Encerrado' que ainda não foram faturadas.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('financeiro.faturamento.index') }}" class="btn btn-outline-primary">
+                        <i class="ti ti-file-invoice me-1"></i>
+                        Ver Faturamentos Realizados
+                    </a>
+                </div>
+            </div>
+
+            @if(!$tabelaDisponivel)
+                <div class="alert alert-warning" role="alert">
+                    A tabela <strong>faturamento_locacoes</strong> ainda não existe no banco. Execute o script SQL <strong>database/sql/create_faturamento_locacoes.sql</strong> para habilitar esta funcionalidade.
+                </div>
+            @endif
+
+            <!-- Estatísticas -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="text-muted">Total de Locações Pendentes</span>
+                            <h4 class="mb-0 mt-1">{{ $stats['total_locacoes'] ?? 0 }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <span class="text-muted">Valor Total a Faturar</span>
+                            <h4 class="mb-0 mt-1 text-primary">R$ {{ number_format($stats['valor_total'] ?? 0, 2, ',', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('financeiro.faturamento.pendentes') }}">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="aprovado" {{ request('status') === 'aprovado' ? 'selected' : '' }}>Aprovado</option>
+                                    <option value="encerrado" {{ request('status') === 'encerrado' ? 'selected' : '' }}>Encerrado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Busca</label>
+                                <input type="text" name="busca" value="{{ request('busca') }}" class="form-control" placeholder="Número do contrato ou nome do cliente">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="ti ti-filter me-1"></i> Filtrar
+                                </button>
+                                <a href="{{ route('financeiro.faturamento.pendentes') }}" class="btn btn-outline-secondary">
+                                    <i class="ti ti-x"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabela de Locações -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Locação</th>
+                                    <th>Cliente</th>
+                                    <th>Período</th>
+                                    <th class="text-end">Valor</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($locacoes as $locacao)
+                                    @php
+                                        $statusClass = match($locacao->status) {
+                                            'aprovado' => 'bg-label-info',
+                                            'encerrado' => 'bg-label-success',
+                                            default => 'bg-label-secondary'
+                                        };
+                                        $statusLabel = ucfirst($locacao->status);
+                                    @endphp
+                                    <tr>
+                                        <td>
+                                            <a href="{{ route('locacoes.show', $locacao->id_locacao) }}" class="text-primary fw-semibold" target="_blank">
+                                                #{{ $locacao->numero_contrato ?? $locacao->id_locacao }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @if($locacao->cliente)
+                                                {{ $locacao->cliente->nome ?? $locacao->cliente->razao_social }}
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <small>
+                                                {{ optional($locacao->data_inicio)->format('d/m/Y') ?? '-' }} até 
+                                                {{ optional($locacao->data_fim)->format('d/m/Y') ?? '-' }}
+                                            </small>
+                                        </td>
+                                        <td class="text-end fw-semibold">
+                                            R$ {{ number_format((float) $locacao->valor_final, 2, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="abrirModalFaturamento({{ $locacao->id_locacao }}, '{{ $locacao->numero_contrato }}', {{ $locacao->valor_final }})">
+                                                <i class="ti ti-file-invoice me-1"></i>
+                                                Faturar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            Nenhuma locação pendente de faturamento encontrada.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if(method_exists($locacoes, 'links'))
+                        <div class="mt-3">
+                            {{ $locacoes->links() }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Faturamento -->
+<div class="modal fade" id="modalFaturamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Faturar Locação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formFaturamento" onsubmit="realizarFaturamento(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="id_locacao_faturamento" name="id_locacao">
+                    
+                    <div class="alert alert-info">
+                        <strong>Locação:</strong> <span id="numero_contrato_display"></span><br>
+                        <strong>Valor:</strong> <span id="valor_display"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="data_vencimento" class="form-label">Data de Vencimento <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="data_vencimento" name="data_vencimento" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="observacoes" class="form-label">Observações</label>
+                        <textarea class="form-control" id="observacoes" name="observacoes" rows="3" maxlength="1000"></textarea>
+                        <small class="text-muted">Máximo 1000 caracteres</small>
+                    </div>
+
+                    <div class="alert alert-warning mb-0">
+                        <i class="ti ti-alert-triangle me-1"></i>
+                        <strong>Atenção:</strong> Ao faturar, será criado automaticamente um registro em "Contas a Receber".
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnFaturar">
+                        <i class="ti ti-check me-1"></i>
+                        Confirmar Faturamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+let modalFaturamento;
+
+document.addEventListener('DOMContentLoaded', function() {
+    modalFaturamento = new bootstrap.Modal(document.getElementById('modalFaturamento'));
+});
+
+function abrirModalFaturamento(idLocacao, numeroContrato, valor) {
+    document.getElementById('id_locacao_faturamento').value = idLocacao;
+    document.getElementById('numero_contrato_display').textContent = '#' + numeroContrato;
+    document.getElementById('valor_display').textContent = 'R$ ' + parseFloat(valor).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    
+    // Definir data de vencimento padrão (30 dias)
+    const dataVencimento = new Date();
+    dataVencimento.setDate(dataVencimento.getDate() + 30);
+    document.getElementById('data_vencimento').value = dataVencimento.toISOString().split('T')[0];
+    
+    // Limpar observações
+    document.getElementById('observacoes').value = '';
+    
+    modalFaturamento.show();
+}
+
+async function realizarFaturamento(event) {
+    event.preventDefault();
+    
+    const btnFaturar = document.getElementById('btnFaturar');
+    const btnTextOriginal = btnFaturar.innerHTML;
+    
+    try {
+        btnFaturar.disabled = true;
+        btnFaturar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Faturando...';
+        
+        const formData = new FormData(event.target);
+        const idLocacao = document.getElementById('id_locacao_faturamento').value;
+        
+        const response = await fetch(`/financeiro/faturamento/faturar/${idLocacao}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Fechar modal
+            modalFaturamento.hide();
+            
+            // Mostrar mensagem de sucesso
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            alertDiv.style.zIndex = '9999';
+            alertDiv.innerHTML = `
+                <i class="ti ti-check me-1"></i>
+                ${data.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Recarregar página após 1.5 segundos
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            alert('Erro: ' + data.message);
+            btnFaturar.disabled = false;
+            btnFaturar.innerHTML = btnTextOriginal;
+        }
+    } catch (error) {
+        console.error('Erro ao faturar:', error);
+        alert('Erro ao processar faturamento. Por favor, tente novamente.');
+        btnFaturar.disabled = false;
+        btnFaturar.innerHTML = btnTextOriginal;
+    }
+}
+</script>
+@endsection

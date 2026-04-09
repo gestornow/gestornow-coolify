@@ -1,0 +1,248 @@
+/* Select2 Custom Styles - Fix for Bootstrap Dropdown Conflicts */
+
+/* Container customizations */
+.select2-custom-container {
+    z-index: 9999 !important;
+}
+
+/* Dropdown customizations */
+.select2-custom-dropdown {
+    z-index: 10000 !important;
+    border: 1px solid #d9dee3;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(165, 163, 174, 0.3);
+}
+
+/* Prevent dropdown from closing parent Bootstrap dropdowns */
+.dropdown-menu .select2-container {
+    position: relative;
+}
+
+.dropdown-menu .select2-dropdown {
+    position: absolute !important;
+    z-index: 10001 !important;
+}
+
+/* Fix for Select2 in navbar dropdowns */
+.navbar .dropdown-menu .select2-container {
+    width: 100% !important;
+}
+
+.navbar .dropdown-menu .select2-dropdown {
+    min-width: 200px;
+}
+
+/* Navbar dropdown select styling */
+.navbar .dropdown-item-text {
+    padding: 0.75rem 1rem !important;
+    white-space: normal !important;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
+    box-sizing: border-box;
+}
+
+.navbar .dropdown-item-text .form-label {
+    color: #697a8d;
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.navbar .dropdown-item-text .select2-container {
+    display: block !important;
+    width: 100% !important;
+}
+
+.navbar .dropdown-item-text .select2-selection {
+    min-height: 36px;
+    border: 1px solid #d9dee3 !important;
+}
+
+/* Ensure proper spacing in navbar dropdown */
+.navbar .dropdown-menu .d-flex.flex-column {
+    gap: 0.25rem;
+}
+
+/* Placeholder text centering */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: #a7acb2;
+    line-height: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+}
+
+/* Fix for text vertical alignment in navbar */
+.navbar .dropdown-item-text .select2-selection--single {
+    height: 36px !important;
+}
+
+.navbar .dropdown-item-text .select2-selection__rendered {
+    line-height: 32px !important;
+    height: 32px !important;
+}
+
+/* Select2 inside dropdown menus */
+.select2-in-dropdown {
+    position: relative !important;
+}
+
+.dropdown-menu .select2-container {
+    position: static !important;
+}
+
+/* Prevent dropdown menu from closing */
+.dropdown-menu .select2-container,
+.dropdown-menu .select2-container * {
+    pointer-events: auto !important;
+}
+
+/* Select2 dropdown positioning when inside Bootstrap dropdown */
+.select2-dropdown {
+    position: absolute !important;
+    z-index: 10000 !important;
+}
+
+/* Ensure Select2 doesn't inherit dropdown styles */
+.select2-container--default .select2-selection--single {
+    background-color: #fff;
+    border: 1px solid #d9dee3;
+    border-radius: 0.375rem;
+    height: 38px;
+    min-height: 38px;
+    padding: 0.4375rem 0.875rem;
+    display: flex;
+    align-items: center;
+}
+
+/* Selection text */
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #697a8d;
+    line-height: 34px;
+    padding-left: 0;
+    padding-right: 20px;
+    display: block;
+    height: 34px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Arrow */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 38px;
+    right: 10px;
+    top: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Results */
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #696cff;
+    color: white;
+}
+
+/* Search box */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #d9dee3;
+    border-radius: 0.375rem;
+    padding: 0.4375rem 0.875rem;
+}
+
+/* Clear button */
+.select2-container--default .select2-selection__clear {
+    color: #697a8d;
+    cursor: pointer;
+    float: right;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.select2-container--default .select2-selection__clear:hover {
+    color: #5a6c7d;
+}
+
+/* Prevent clicks from propagating to parent elements */
+.select2-container,
+.select2-dropdown {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Fix for modal and dropdown z-index conflicts */
+.modal .select2-container {
+    z-index: 10050;
+}
+
+.modal .select2-dropdown {
+    z-index: 10051;
+}
+
+/* Force Select2 dropdown width and text wrapping */
+.select2-dropdown {
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.select2-dropdown .select2-results__options {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.select2-dropdown .select2-results__option {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    max-width: 100%;
+    padding: 8px 12px;
+    line-height: 1.4;
+    min-height: auto;
+    box-sizing: border-box;
+}
+
+/* Search field width control */
+.select2-dropdown .select2-search {
+    padding: 4px 8px;
+}
+
+.select2-dropdown .select2-search .select2-search__field {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+/* Container do Select2 deve pegar toda largura disponível */
+.select2-container {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.select2-container .select2-selection--single {
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.select2-container .select2-selection__rendered {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 30px !important;
+}
+
+/* Fix para dropdown do Bootstrap não crescer */
+.navbar .dropdown-item-text .d-flex.flex-column {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.navbar .dropdown-item-text .select2-container {
+    max-width: 100% !important;
+}

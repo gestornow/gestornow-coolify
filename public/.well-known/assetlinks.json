@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.flutter_upgrde_app",
+      "sha256_cert_fingerprints": [
+        "E68ADE1B5AF586F58E0FC1E98FF851BD6419E654F7B9E2E377F41DEC870C64995C"
+      ]
+    }
+  }
+]

@@ -1,0 +1,326 @@
+{
+  "menu": [
+    {
+      "name": "Produtos",
+      "icon":"menu-icon tf-icons ti ti-brand-dropbox",
+      "slug": "produtos",
+      "submenu": [
+        {
+          "url": "produtos",
+          "name": "Listar Produtos",
+          "slug": "produtos-index"
+        },
+          {
+          "url": "produtos/create",
+          "name": "Cadastrar Produto",
+          "slug": "produtos-create"
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "icon":"menu-icon tf-icons ti ti-user-scan",
+      "slug": "clientes",
+      "submenu": [
+        {
+          "url": "clientes",
+          "name": "Listar Clientes",
+          "slug": "clientes-index"
+        },
+        {
+          "url": "clientes/create",
+          "name": "Cadastrar Cliente",
+          "slug": "clientes-create"
+        }
+      ]
+    },
+    {
+        "icon": "menu-icon tf-icons ti ti-truck-loading",
+        "name": "Fornecedores",
+        "slug": "fornecedores",
+        "submenu": [
+          {
+            "url": "fornecedores",
+            "name": "Listar Fornecedores",
+            "slug": "fornecedores-index"
+          },
+          {
+            "url": "fornecedores/create",
+            "name": "Cadastrar Fornecedor",
+            "slug": "fornecedores-create"
+          }
+        ]
+    },
+    {
+      "name": "Locações",
+      "icon": "menu-icon tf-icons ti ti-file-description",
+      "slug": "Locações",
+      "submenu": [
+        {
+          "url": "layouts/collapsed-menu",
+          "name": "Collapsed menu",
+          "slug": "layouts-collapsed-menu"
+        },
+        {
+          "url": "layouts/content-navbar",
+          "name": "Content navbar",
+          "slug": "layouts-content-navbar"
+        },
+        {
+          "url": "layouts/content-nav-sidebar",
+          "name": "Content nav + Sidebar",
+          "slug": "layouts-content-nav-sidebar"
+        },
+        {
+          "url": "layouts/horizontal",
+          "name": "Horizontal",
+          "slug": "layouts-horizontal",
+          "target": "_blank"
+        },
+        {
+          "url": "layouts/without-menu",
+          "name": "Without menu",
+          "slug": "layouts-without-menu"
+        },
+        {
+          "url": "layouts/without-navbar",
+          "name": "Without navbar",
+          "slug": "layouts-without-navbar"
+        },
+        {
+          "url": "layouts/fluid",
+          "name": "Fluid",
+          "slug": "layouts-fluid"
+        },
+        {
+          "url": "layouts/container",
+          "name": "Container",
+          "slug": "layouts-container"
+        },
+        {
+          "url": "layouts/blank",
+          "name": "Blank",
+          "slug": "layouts-blank",
+          "target": "_blank"
+        }
+      ]
+    },
+     {
+      "name": "Expedição",
+      "icon": "menu-icon tf-icons ti ti-devices-pin",
+      "slug": "expedicao",
+      "submenu": [
+        {
+          "url": "layouts/collapsed-menu",
+          "name": "Status",
+          "slug": "layouts-collapsed-menu"
+        },
+        {
+          "url": "layouts/content-navbar",
+          "name": "Check-out",
+          "slug": "layouts-content-navbar"
+        },
+        {
+          "url": "layouts/content-nav-sidebar",
+          "name": "Check-in",
+          "slug": "layouts-content-nav-sidebar"
+        },
+        {
+          "url": "layouts/horizontal",
+          "name": "Troca de Produto",
+          "slug": "layouts-horizontal",
+          "target": "_blank"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Financeiro & Relatórios"
+    },
+     {
+      "name": "Financeiro",
+      "icon": "menu-icon tf-icons ti ti-device-desktop-dollar",
+      "slug": "financeiro",
+      "submenu": [
+        {
+          "url": "financeiro/contas-a-pagar",
+          "name": "Contas a Pagar",
+          "slug": "financeiro-contas-a-pagar-index"
+        },
+         {
+          "url": "financeiro/contas-a-receber",
+          "name": "Contas a Receber",
+          "slug": "financeiro-contas-a-receber-index"
+        },
+        {
+          "url": "financeiro/boletos",
+          "name": "Boletos",
+          "slug": "financeiro-boletos-index"
+        },
+        {
+          "url": "financeiro/fluxo-caixa",
+          "name": "Fluxo de Caixa",
+          "slug": "financeiro-fluxo-caixa-index"
+        },
+        {
+          "url": "financeiro/faturamento",
+          "name": "Faturamento",
+          "slug": "financeiro-faturamento-index"
+        },
+        {
+          "name": "Cadastros",
+          "slug": "layouts-horizontal",
+          "icon": "menu-icon tf-icons ti ti-database",
+          "target": "_blank",
+          "submenu": [
+            {
+              "url": "layouts/horizontal",
+              "name": "Formas de Pagamento",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Condições de Pagamento",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "financeiro/categorias",
+              "name": "Categorias Financeiras",
+              "slug": "financeiro-categorias-index"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Caixas",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "financeiro/bancos",
+              "name": "Bancos",
+              "slug": "financeiro-bancos-index"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Cartões de Crédito",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Centro de Custos",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Tipos de Lançamento",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            },
+            {
+              "url": "layouts/horizontal",
+              "name": "Juros e Multas",
+              "slug": "layouts-horizontal",
+              "target": "_blank"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "menuHeader": "Configurações do Sistema"
+    },
+    {
+      "name": "Admin",
+      "icon": "menu-icon tf-icons ti ti-users",
+      "slug": "app-user",
+      "submenu": [
+        {
+          "url": "usuarios",
+          "name": "Lista de Usuários",
+          "slug": "app-user-list"
+        },
+        {
+          "url": "app/access-log",
+          "name": "Logs de Acesso",
+          "slug": "app-access-log"
+        },
+        {
+          "name": "Permissões",
+          "slug": "app-user-view",
+          "submenu": [
+            {
+              "url": "app/user/view/profile",
+              "name": "Criar Permissão",
+              "slug": "app-user-view-profile"
+            },
+            {
+              "url": "app/user/view/account",
+              "name": "Listar Permissões",
+              "slug": "app-user-view-account"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Configurações",
+      "icon": "menu-icon tf-icons ti ti-settings",
+      "slug": "app-access",
+      "submenu": [
+        {
+          "url": "configuracoes",
+          "name": "Empresa",
+          "slug": "configuracoes-empresa"
+        }
+      ]
+    },
+    {
+      "menuHeader": "Uso interno"
+    },
+    {
+      "url": "app/calendar",
+      "name": "Calendario",
+      "icon": "menu-icon tf-icons ti ti-calendar",
+      "slug": "app-calendar"
+    },
+    {
+       "url": "app/kanban",
+      "name": "Kanban",
+      "icon": "menu-icon tf-icons ti ti-layout-kanban",
+      "slug": "app-kanban"
+    },
+    {
+      "url": "app/notes",
+      "name": "Notas",
+      "icon": "menu-icon tf-icons ti ti-notebook",
+      "slug": "app-notas"
+    },
+    {
+      "menuHeader": "Suporte & Ajuda"
+    },
+    {
+      "name": "Suporte",
+      "icon": "menu-icon tf-icons ti ti-lifebuoy",
+      "slug": "support",
+      "submenu": [
+        {
+          "url": "support/knowledge-base",
+          "name": "Sugestões de Melhoria",
+          "slug": "support-knowledge-base"
+        },
+        {
+          "url": "support/knowledge-base/article",
+          "name": "FAQ",
+          "slug": "support-knowledge-base-article"
+        },
+        {
+          "url": "support/tickets/view",
+          "name": "Visualizar meus Ticket",
+          "slug": "support-tickets-view"
+        }
+      ]
+    }
+  ]
+}
