@@ -94,7 +94,4 @@ return [
         'timeout' => env('PAGHIPER_TIMEOUT', 60),
     ],
 
-    // Renight gay
-    // Muito gay mesmo
-
 ];
