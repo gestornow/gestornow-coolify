@@ -3,6 +3,8 @@ const mix = require('laravel-mix');
 const glob = require('glob');
 const path = require('path');
 
+mix.setPublicPath('public');
+
 /*
  |--------------------------------------------------------------------------
  | Configure mix

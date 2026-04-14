@@ -13,7 +13,8 @@ RUN npm ci --legacy-peer-deps
 COPY resources ./resources
 COPY public ./public
 
-RUN npm run production
+RUN rm -f public/mix-manifest.json \
+    && npm run production
 
 FROM php:8.2-apache
 
