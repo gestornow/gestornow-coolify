@@ -75,7 +75,8 @@ COPY --from=frontend /app/public ./public
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache \
-    && composer dump-autoload --optimize --no-dev \
+    && rm -f bootstrap/cache/*.php \
+    && composer dump-autoload --optimize --no-dev --no-scripts \
     && php artisan package:discover --ansi \
     && printf '* * * * * cd /var/www/html && php artisan schedule:run >> /proc/1/fd/1 2>&1\n' > /etc/cron.d/laravel-scheduler \
     && chmod 0644 /etc/cron.d/laravel-scheduler \

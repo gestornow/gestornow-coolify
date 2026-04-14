@@ -16,6 +16,7 @@ storage/framework/sessions
 storage/framework/testing
 storage/framework/views
 storage/logs
+bootstrap/cache/*.php
 CHANGELOG_*.md
 compile-assets.md
 deploy-smart.sh
