@@ -1,66 +1,248 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GestorNow
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema ERP multi-tenant para gestão de locação de equipamentos, PDV, financeiro e faturamento. Construído com Laravel 12 + PHP 8.2.
 
-## About Laravel
+## O que é
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+O GestorNow é uma plataforma SaaS voltada para empresas que trabalham com **locação de equipamentos e venda**, permitindo controlar todo o ciclo operacional em um único sistema: do orçamento ao contrato, da entrega ao retorno, do financeiro ao faturamento.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+O sistema é **multi-tenant**: cada empresa (tenant) opera de forma completamente isolada. Um usuário pode pertencer a mais de uma filial e alternar entre elas sem precisar fazer novo login.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Módulos do sistema
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Locações
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+O núcleo do sistema. Controla o ciclo completo de locação de equipamentos:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Orçamentos e contratos** — criação de orçamentos que evoluem para contratos ativos, com status controlado (orçamento → ativo → concluído → cancelado)
+- **Itens do contrato** — produtos com patrimônios individuais, serviços avulsos, despesas, salas e produtos de terceiros (sublocação)
+- **Disponibilidade de patrimônios** — verificação em tempo real de quais unidades estão disponíveis em um determinado período
+- **Expedição / Logística** — painel kanban para controle do fluxo de saída de contratos (separação, carregamento, entrega)
+- **Checklist de entrega/retorno** — registro fotográfico e confirmação por etapas do estado dos equipamentos ao sair e ao voltar
+- **Retorno parcial** — devolução de parte dos itens mantendo o contrato ativo para o restante
+- **Troca de produto** — substituição de um patrimônio por outro durante o contrato, com registro e comprovante em PDF
+- **Renovação / Aditivo** — prorrogação de datas por item ou do contrato inteiro, gerando aditivo
+- **Medições** — controle de movimentações mensais de contratos de longa duração (envios e retornos parciais por período)
+- **Assinatura digital** — envio de link por e-mail para o cliente assinar o contrato digitalmente, sem precisar de conta no sistema
+- **Contrato em PDF** — geração de contrato a partir de modelos personalizados por empresa, com variáveis dinâmicas
+- **Modelos de contrato** — editor de templates com suporte a orçamento, contrato padrão e aditivo; possibilidade de duplicar e definir padrão
+- **Relatório gerencial de contratos** — exportação em PDF com visão consolidada dos contratos ativos
 
-## Laravel Sponsors
+### Produtos e Patrimônios
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- **Produtos** — cadastro com foto, categoria, unidade, código interno, observações e histórico de locações; exportação de ficha em PDF e Excel
+- **Patrimônios** — cada produto pode ter N unidades serializadas (número de patrimônio, plaqueta, série); cadastro em massa; controle de status (disponível, locado, em manutenção)
+- **Acessórios** — itens complementares que podem ser vinculados a produtos
+- **Manutenção** — registro de ordens de manutenção por patrimônio, com histórico
+- **Tabela de preços** — múltiplas tabelas por produto com cálculo por período (diária, semanal, quinzenal, mensal)
+- **Controle de estoque** — movimentações manuais de entrada e saída com histórico
+- **Produtos de terceiros** — cadastro de equipamentos de fornecedores para sublocação dentro de contratos
 
-### Premium Partners
+### PDV — Ponto de Venda
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- Tela de caixa com busca de produto por nome ou código de barras
+- Verificação de estoque em tempo real
+- Carrinho de compras, aplicação de desconto e fechamento de venda
+- Catálogo de **produtos de venda** separado dos produtos de locação, com controle de estoque próprio
 
-## Contributing
+### Financeiro
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Contas a pagar** — com parcelamento, recorrência, baixa manual ou automática, histórico de pagamentos, recibo em PDF e log de atividades
+- **Contas a receber** — idem ao pagar, com vínculo opcional a locações e vendas
+- **Boletos** — emissão integrada com três provedores: **Mercado Pago**, **PagHiper** e **Cora** (OAuth2); consulta de status, alteração de vencimento, histórico e download em PDF
+- **Fluxo de caixa** — visão de entradas e saídas por período, com exportação em PDF e Excel
+- **Relatórios** — contas a pagar e a receber filtrados por status, período e categoria, com exportação em PDF e Excel
+- **Faturamento de locações** — tela de medição e faturamento mensal de contratos; preview antes de faturar; faturamento individual ou em lote; cancelamento; geração de PDF
+- **Categorias financeiras** — organização por tipo (receita / despesa)
+- **Formas de pagamento** — cadastro para uso em baixas e vendas
+- **Bancos** — cadastro de contas bancárias da empresa
 
-## Code of Conduct
+### Clientes
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Cadastro completo: dados pessoais / CNPJ, endereço com busca de CEP, contatos, observações e foto
+- Histórico de locações e log de atividades
+- Busca de cidades por UF
 
-## Security Vulnerabilities
+### Fornecedores
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- Cadastro de fornecedores de produtos e serviços
+- Vinculação com produtos de terceiros para sublocação
 
-## License
+### Usuários e Permissões
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Criação de usuários com envio de link de definição de senha por e-mail
+- **Grupos de permissões** — perfis criados por empresa com chaves granulares (ex.: `locacoes.visualizar`, `financeiro.boletos`, `expedicao.logistica.mover-card`)
+- Atribuição de grupo por empresa (um usuário pode ter perfis diferentes em cada filial)
+- Suporte a **sessão única** — cada usuário só pode ter uma sessão ativa por vez
+- Controle de tema (dark/light) salvo por usuário
+
+### Calendário
+
+- Visualização de locações e eventos por data em formato de calendário
+
+### Configurações da Empresa
+
+- Dados cadastrais, logo e configurações gerais da empresa
+- Gestão de grupos de permissões
+
+### Billing (gestão da plataforma)
+
+- Controle de planos e módulos disponíveis
+- Assinatura self-service pelo dashboard: upgrade de plano, gestão de método de pagamento, cancelamento
+- Integração com **Asaas** para cobrança recorrente (webhooks de pagamento)
+- Onboarding obrigatório para novos clientes: preenchimento de dados e aceite do contrato de licenciamento
+- Painel admin para gestão de planos contratados, filiais e módulos
+
+### Admin (suporte interno)
+
+- Gerenciamento de planos, módulos e categorias de menu
+- Visualização de logs de atividade de todas as empresas
+- Troca de filial sem novo login (exclusivo para usuários de suporte)
+
+---
+
+## Integrações externas
+
+| Serviço | Finalidade |
+|---|---|
+| **Asaas** | Cobrança recorrente da plataforma (billing SaaS); webhooks de confirmação de pagamento |
+| **Mercado Pago** | Emissão de boletos para clientes das empresas |
+| **PagHiper** | Emissão de boletos (provedor alternativo) |
+| **Cora** | Emissão de boletos via OAuth2 |
+
+---
+
+## Arquitetura
+
+A aplicação segue uma arquitetura híbrida em migração progressiva para domínio modular.
+
+```
+app/
+├── Domain/               # Camada de domínio (destino de todo código novo de negócio)
+│   ├── Auth/             # Empresa, Usuario, UsuarioPermissao
+│   ├── Cliente/          # Cliente
+│   ├── Locacao/          # Locacao, LocacaoProduto, LocacaoServico, LocacaoDespesa,
+│   │                     # LocacaoSala, LocacaoRetornoPatrimonio, LocacaoModeloContrato,
+│   │                     # LocacaoAssinaturaDigital, LocacaoChecklist, LocacaoTrocaProduto,
+│   │                     # ProdutoTerceirosLocacao
+│   ├── Produto/          # Produto, Patrimonio, PatrimonioHistorico, ProdutoHistorico,
+│   │                     # Acessorio, ProdutoAcessorio, ProdutoTerceiro, ProdutoVenda,
+│   │                     # TabelaPreco, Manutencao, MovimentacaoEstoque
+│   ├── User/             # Serviços de usuário
+│   └── Venda/            # Venda, VendaItem
+│
+├── Http/
+│   ├── Controllers/      # Camada fina: orquestra request → service → response
+│   │   ├── Locacao/      # LocacaoController, ExpedicaoController, ModeloContratoController
+│   │   ├── Produto/      # ProdutoController, PatrimonioController, TabelaPrecoController...
+│   │   ├── Financeiro/   # ContasAPagarController, BoletosController, FaturamentoController...
+│   │   ├── Venda/        # PDVController
+│   │   ├── Billing/      # AssinaturaController, MeuFinanceiroController
+│   │   ├── Admin/        # PlanosController, FiliaisController, ModulosController, AdminLogController
+│   │   └── Onboarding/   # OnboardingController
+│   ├── Requests/         # Toda validação vive aqui (FormRequests por contexto)
+│   ├── Resources/        # Transformadores de resposta API
+│   └── Middleware/       # CheckPermissao, VerificarAcessoEmpresa, VerifyUniqueSession,
+│                         # SecureAuthMiddleware, LocaleMiddleware
+│
+├── Models/               # CONGELADO — modelos legados (ContasAPagar, ContasAReceber,
+│                         # Boleto, FluxoCaixa, FormaPagamento, Plano, Notificacao...)
+├── Services/             # TRANSIÇÃO — serviços transversais e infraestrutura
+│                         # (PermissaoService, FinanceiroService, ParcelamentoService,
+│                         #  EstoqueService, NotificacaoService, LimiteService...)
+├── ActivityLog/          # Log centralizado: ActionLogger, Maps/, Traits/, Observers/
+├── Facades/              # Perm (facade sobre PermissaoService)
+└── Policies/             # ContasAPagarPolicy, ContasAReceberPolicy
+
+resources/views/
+├── locacoes/             # Telas de locação
+├── produtos/             # Telas de produtos e patrimônios
+├── financeiro/           # Contas, boletos, fluxo de caixa, faturamento
+├── cliente/              # Cadastro de clientes
+├── fornecedor/           # Cadastro de fornecedores
+├── pdv/                  # Ponto de venda
+├── acessorios/           # Gestão de acessórios
+├── billing/              # Assinatura e planos
+├── usuario/              # Gestão de usuários
+├── configuracoes/        # Configurações da empresa
+├── calendario/           # Calendário de locações
+├── onboarding/           # Fluxo de onboarding
+├── layouts/              # contentNavbarLayout (principal), blankLayout (auth)
+└── _partials/            # Macros, modais, offcanvas reutilizáveis
+```
+
+### Convenções principais
+
+| Tema | Regra |
+|---|---|
+| **Multi-tenancy** | Toda query em dado de tenant deve ser filtrada por `id_empresa` |
+| **PKs** | Não-padrão: `id_clientes`, `id_locacao`, `id_produto`, `id_patrimonio`... sempre verifique `$primaryKey` |
+| **Permissões** | Chaves string (`locacoes.visualizar`), middleware `permissao:chave`, facade `Perm::pode()` |
+| **Log de atividade** | Trait `RegistraAtividade` no model + `Maps/<Entidade>Map.php`; manual via `ActionLogger` |
+| **Soft deletes** | Entidades principais usam `SoftDeletes`; use `withTrashed()` só quando explicitamente necessário |
+| **Migrations** | Nunca editar arquivos existentes; sempre novo arquivo timestamped |
+| **Validação** | Sempre em `FormRequest`, nunca no controller |
+| **Regras de negócio** | Nunca no controller; sempre em `Domain/<Contexto>/Services/` |
+
+---
+
+## Requisitos
+
+- PHP 8.2+
+- MySQL 8.0+
+- Node.js (para compilação dos assets com Laravel Mix)
+- Composer
+
+## Instalação local
+
+```bash
+# 1. Instalar dependências
+composer install
+npm install
+
+# 2. Configurar ambiente
+cp .env.example .env
+php artisan key:generate
+
+# 3. Criar banco e rodar migrations
+php artisan migrate
+
+# 4. Compilar assets
+npm run dev
+
+# 5. Subir servidor
+php artisan serve
+```
+
+### Com Docker (Laravel Sail)
+
+```bash
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan migrate
+./vendor/bin/sail npm run dev
+```
+
+---
+
+## Documentação técnica
+
+Documentação e decisões arquiteturais estão em [`docs/`](docs/):
+
+| Arquivo | Conteúdo |
+|---|---|
+| [`arquitetura-e-organizacao.md`](docs/arquitetura-e-organizacao.md) | Estrutura, padrões e backlog de refatoração |
+| [`permissoes-clientes-produtos-locacoes.md`](docs/permissoes-clientes-produtos-locacoes.md) | Sistema de permissões por chave |
+| [`log-atividade-centralizado.md`](docs/log-atividade-centralizado.md) | Como funciona o ActivityLog |
+| [`sessao-unica.md`](docs/sessao-unica.md) | Sessão única por usuário/empresa |
+| [`asaas-webhook-scheduler.md`](docs/asaas-webhook-scheduler.md) | Integração Asaas e webhooks |
+| [`auth-flutter.md`](docs/auth-flutter.md) | Autenticação para clientes mobile |
+| [`planos-modulos-atualizacao.md`](docs/planos-modulos-atualizacao.md) | Gestão de planos e módulos |
+| [`changelogs/`](docs/changelogs/) | Notas de implementação do ActivityLog por módulo (Locacao, Financeiro, Produtos, PDV...) |
+
+---
+
+## Licença
+
+MIT License — Copyright (c) 2026 gestornow. Veja o arquivo [LICENSE](LICENSE) para detalhes.
