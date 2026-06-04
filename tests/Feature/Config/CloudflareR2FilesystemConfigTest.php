@@ -14,4 +14,3 @@ class CloudflareR2FilesystemConfigTest extends TestCase
         $this->assertSame('s3', $disk['driver']);
     }
 }
-
