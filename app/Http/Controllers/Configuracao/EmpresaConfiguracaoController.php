@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Configuracao;
 
 use App\ActivityLog\ActionLogger;
 use App\Domain\Auth\Models\Empresa;
+use App\Domain\Auth\Services\EmpresaLogoStorageService;
 use App\Domain\Locacao\Models\Locacao;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +36,7 @@ class EmpresaConfiguracaoController extends Controller
         return view('configuracoes.empresa', compact('empresa', 'logoUrl', 'podeAlterarPreferenciaNumeracao', 'permitirNumeroManualLocacao'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, EmpresaLogoStorageService $empresaLogoStorageService)
     {
         $idEmpresa = session('id_empresa') ?? Auth::user()->id_empresa ?? null;
 
@@ -84,84 +84,24 @@ class EmpresaConfiguracaoController extends Controller
         $configuracoes = is_array($empresa->configuracoes) ? $empresa->configuracoes : [];
 
         if ($request->hasFile('logo')) {
-            $arquivoLogo = $request->file('logo');
-            $urlLogo = null;
-
-            $apiBase = rtrim((string) config('services.gestornow_api.base_url', ''), '/');
-
-            if (!empty($apiBase)) {
-                try {
-                    $response = Http::timeout(30)
-                        ->asMultipart()
-                        ->attach('file', file_get_contents($arquivoLogo->getRealPath()), $arquivoLogo->getClientOriginalName())
-                        ->post($apiBase . '/api/logos', [
-                            'idEmpresa' => $idEmpresa,
-                            'idLogo' => $idEmpresa,
-                            'nomeImagemLogo' => 'Logo Empresa ' . $idEmpresa,
-                        ]);
-
-                    if ($response->successful()) {
-                        $payload = $response->json();
-                        $urlRetornada = $payload['data']['file']['url']
-                            ?? $payload['data']['url']
-                            ?? $payload['url']
-                            ?? null;
-
-                        if ($urlRetornada) {
-                            // Se a URL já é completa (começa com http), usa direto
-                            if (str_starts_with($urlRetornada, 'http://') || str_starts_with($urlRetornada, 'https://')) {
-                                $urlLogo = $urlRetornada;
-                            } else {
-                                // Senão, concatena com a base da API
-                                $urlLogo = $apiBase . '/' . ltrim($urlRetornada, '/');
-                            }
-                            
-                            // Log de sucesso
-                            Log::info('Logo enviada com sucesso para API', [
-                                'empresa_id' => $idEmpresa,
-                                'url' => $urlLogo,
-                                'filename' => $payload['data']['file']['filename'] ?? null,
-                            ]);
-                        }
-                    } else {
-                        // Log do erro para debug
-                        Log::warning('Falha ao enviar logo para API', [
-                            'status' => $response->status(),
-                            'body' => $response->body(),
-                        ]);
-                    }
-                } catch (\Throwable $e) {
-                    // Log da exceção para debug
-                    Log::error('Erro ao enviar logo para API', [
-                        'empresa_id' => $idEmpresa,
-                        'message' => $e->getMessage(),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ]);
-                }
-            }
-
-            // Fallback: salvar localmente se a API falhar ou não estiver configurada
-            if (!$urlLogo) {
-                $nomeArquivo = 'logo_empresa_' . $idEmpresa . '_' . time() . '.' . $arquivoLogo->getClientOriginalExtension();
-                $diretorioPublico = public_path('assets/logos-empresa');
-                if (!File::exists($diretorioPublico)) {
-                    File::makeDirectory($diretorioPublico, 0755, true);
-                }
-
-                $arquivoLogo->move($diretorioPublico, $nomeArquivo);
-                $urlLogo = asset('assets/logos-empresa/' . $nomeArquivo);
-                
-                // Log do uso do fallback local
-                Log::info('Logo salva localmente (fallback)', [
+            try {
+                $configuracoes['logo_url'] = $empresaLogoStorageService->store($request->file('logo'), (int) $idEmpresa);
+                $configuracoes['logo_updated_at'] = now()->toDateTimeString();
+            } catch (\Throwable $e) {
+                Log::error('Erro ao enviar logo para o disco S3.', [
                     'empresa_id' => $idEmpresa,
-                    'filename' => $nomeArquivo,
-                    'reason' => empty($apiBase) ? 'API não configurada' : 'Falha no upload para API',
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
                 ]);
-            }
 
-            $configuracoes['logo_url'] = $urlLogo;
-            $configuracoes['logo_updated_at'] = now()->toDateTimeString();
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->withErrors([
+                        'logo' => 'Não foi possível enviar a logo para o armazenamento configurado.',
+                    ]);
+            }
         }
 
         $empresa->configuracoes = $configuracoes;
