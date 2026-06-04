@@ -3,6 +3,7 @@
 namespace App\Domain\Auth\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -28,7 +29,7 @@ class EmpresaLogoStorageService
             throw new RuntimeException('Falha ao persistir a logo no disco S3 configurado.');
         }
 
-        $url = Storage::disk('s3')->url($storedPath);
+        $url = $this->buildPublicUrl($storedPath);
 
         if (!is_string($url) || trim($url) === '') {
             throw new RuntimeException('Falha ao gerar URL publica para a logo enviada.');
@@ -41,5 +42,35 @@ class EmpresaLogoStorageService
         ]);
 
         return $url;
+    }
+
+    public static function publicUrlFromPath(string $path): string
+    {
+        $normalizedPath = ltrim($path, '/');
+
+        if ($normalizedPath === '') {
+            return '';
+        }
+
+        $diskConfig = (array) config('filesystems.disks.s3', []);
+        $baseUrl = trim((string) Arr::get($diskConfig, 'url', ''));
+        $bucket = trim((string) Arr::get($diskConfig, 'bucket', ''));
+
+        if ($baseUrl !== '') {
+            $baseUrl = rtrim($baseUrl, '/');
+
+            if ($bucket !== '' && !str_ends_with($baseUrl, '/' . $bucket)) {
+                return $baseUrl . '/' . $bucket . '/' . $normalizedPath;
+            }
+
+            return $baseUrl . '/' . $normalizedPath;
+        }
+
+        return (string) Storage::disk('s3')->url($normalizedPath);
+    }
+
+    private function buildPublicUrl(string $storedPath): string
+    {
+        return self::publicUrlFromPath($storedPath);
     }
 }

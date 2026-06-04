@@ -123,6 +123,11 @@ class EmpresaConfiguracaoController extends Controller
             return null;
         }
 
+        $logoR2 = $this->normalizarLogoUrlR2($logoUrl);
+        if ($logoR2) {
+            return $logoR2;
+        }
+
         $logoMigrada = $this->migrarLogoLegadaParaPublico($logoUrl);
         if ($logoMigrada) {
             return $logoMigrada;
@@ -133,6 +138,39 @@ class EmpresaConfiguracaoController extends Controller
         }
 
         return asset(ltrim($logoUrl, '/'));
+    }
+
+    private function normalizarLogoUrlR2(string $logoUrl): ?string
+    {
+        $publicBaseUrl = rtrim((string) config('filesystems.disks.s3.url'), '/');
+
+        if ($publicBaseUrl === '') {
+            return null;
+        }
+
+        $logoPath = parse_url($logoUrl, PHP_URL_PATH);
+
+        if (!is_string($logoPath) || trim($logoPath, '/') === '') {
+            $logoPath = $logoUrl;
+        }
+
+        $logoPath = trim((string) $logoPath, '/');
+
+        if ($logoPath === '') {
+            return null;
+        }
+
+        $bucket = trim((string) config('filesystems.disks.s3.bucket'), '/');
+
+        if ($bucket !== '' && str_starts_with($logoPath, $bucket . '/')) {
+            $logoPath = substr($logoPath, strlen($bucket) + 1);
+        }
+
+        if ($logoPath === '') {
+            return null;
+        }
+
+        return EmpresaLogoStorageService::publicUrlFromPath($logoPath);
     }
 
     private function migrarLogoLegadaParaPublico(string $logoUrl): ?string
