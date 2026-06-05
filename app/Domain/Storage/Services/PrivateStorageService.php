@@ -117,6 +117,16 @@ class PrivateStorageService
      */
     private function validarContexto(string $contexto): void
     {
+        if (trim($contexto) === '') {
+            throw new \InvalidArgumentException('Contexto de arquivo não pode ser vazio.');
+        }
+
+        if (str_contains($contexto, '..')) {
+            throw new \InvalidArgumentException(
+                'Contexto inválido para path de arquivo: "' . $contexto . '". Sequência ".." não é permitida.'
+            );
+        }
+
         if (!preg_match('/^[a-z0-9\-_\/]+$/i', $contexto)) {
             throw new \InvalidArgumentException(
                 'Contexto inválido para path de arquivo: "' . $contexto . '". Use apenas letras, números, hífens, underscores e barras.'

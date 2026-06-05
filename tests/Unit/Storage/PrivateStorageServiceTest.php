@@ -43,6 +43,17 @@ class PrivateStorageServiceTest extends TestCase
         $metodo->invoke($this->service, 'contexto com espaço');
     }
 
+    public function test_valida_contexto_invalido_com_path_traversal(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/\.\./');
+
+        $reflexao = new \ReflectionClass($this->service);
+        $metodo = $reflexao->getMethod('validarContexto');
+        $metodo->setAccessible(true);
+        $metodo->invoke($this->service, 'docs/../segredos');
+    }
+
     public function test_valida_contexto_com_caracteres_validos(): void
     {
         $reflexao = new \ReflectionClass($this->service);

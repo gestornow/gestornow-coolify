@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ArquivoPrivadoController extends Controller
 {
+    private const MIN_EXPIRACAO_MINUTOS = 1;
+    private const MAX_EXPIRACAO_MINUTOS = 1440; // 24 horas
+
     public function __construct(private readonly PrivateFileService $privateFileService)
     {
     }
@@ -95,7 +98,7 @@ class ArquivoPrivadoController extends Controller
         }
 
         $minutos = (int) $request->query('minutos', 60);
-        $minutos = max(1, min($minutos, 1440)); // entre 1 minuto e 24 horas
+        $minutos = max(self::MIN_EXPIRACAO_MINUTOS, min($minutos, self::MAX_EXPIRACAO_MINUTOS));
 
         try {
             $url = $this->privateFileService->urlTemporaria($pathDecodificado, $idEmpresa, $minutos);

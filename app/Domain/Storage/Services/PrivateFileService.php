@@ -62,7 +62,7 @@ class PrivateFileService
 
         $response = new StreamedResponse(function () use ($path) {
             $stream = Storage::disk(self::DISCO)->readStream($path);
-            if ($stream !== null) {
+            if (is_resource($stream)) {
                 fpassthru($stream);
                 fclose($stream);
             }
