@@ -2,6 +2,7 @@
 
 namespace App\Domain\Locacao\Models;
 
+use App\Domain\Locacao\Services\LocacaoAssinaturaClienteStorageService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Schema;
@@ -1181,32 +1182,7 @@ class LocacaoModeloContrato extends Model
 
     private function resolverAssinaturaCliente(?string $assinaturaUrl): ?string
     {
-        if (empty($assinaturaUrl)) {
-            return null;
-        }
-
-        $assinaturaUrl = str_replace(['https//', 'http//'], ['https://', 'http://'], trim((string) $assinaturaUrl));
-
-        $assinaturaPath = parse_url($assinaturaUrl, PHP_URL_PATH);
-        $assinaturaFileLocal = $assinaturaPath ? public_path(ltrim($assinaturaPath, '/')) : null;
-
-        if ($assinaturaFileLocal && file_exists($assinaturaFileLocal)) {
-            return $assinaturaFileLocal;
-        }
-
-        if (str_starts_with($assinaturaUrl, 'http://') || str_starts_with($assinaturaUrl, 'https://')) {
-            try {
-                $response = \Illuminate\Support\Facades\Http::timeout(20)->get($assinaturaUrl);
-                if ($response->successful()) {
-                    $mime = $response->header('Content-Type') ?: 'image/png';
-                    return 'data:' . $mime . ';base64,' . base64_encode($response->body());
-                }
-            } catch (\Throwable $e) {
-                // fallback para URL original
-            }
-        }
-
-        return $assinaturaUrl;
+        return LocacaoAssinaturaClienteStorageService::resolveInlineSource($assinaturaUrl);
     }
 
     /**

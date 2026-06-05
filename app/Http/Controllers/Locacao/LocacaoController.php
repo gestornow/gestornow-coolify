@@ -17,6 +17,7 @@ use App\Domain\Locacao\Models\LocacaoAssinaturaDigital;
 use App\Domain\Locacao\Models\LocacaoChecklistFoto;
 use App\Domain\Locacao\Models\LocacaoTrocaProduto;
 use App\Domain\Locacao\Models\ProdutoTerceirosLocacao;
+use App\Domain\Locacao\Services\LocacaoAssinaturaClienteStorageService;
 use App\Domain\Cliente\Models\Cliente;
 use App\Domain\Produto\Models\Manutencao;
 use App\Domain\Produto\Models\Produto;
@@ -56,18 +57,21 @@ class LocacaoController extends Controller
     protected $contratoPdfService;
     protected $locacaoRenovacaoService;
     protected $manutencaoEstoqueService;
+    protected $assinaturaClienteStorageService;
 
     public function __construct(
         EstoqueService $estoqueService,
         ContratoPdfService $contratoPdfService,
         LocacaoRenovacaoService $locacaoRenovacaoService,
-        ManutencaoEstoqueService $manutencaoEstoqueService
+        ManutencaoEstoqueService $manutencaoEstoqueService,
+        LocacaoAssinaturaClienteStorageService $assinaturaClienteStorageService
     )
     {
         $this->estoqueService = $estoqueService;
         $this->contratoPdfService = $contratoPdfService;
         $this->locacaoRenovacaoService = $locacaoRenovacaoService;
         $this->manutencaoEstoqueService = $manutencaoEstoqueService;
+        $this->assinaturaClienteStorageService = $assinaturaClienteStorageService;
     }
 
     /**
@@ -6901,6 +6905,7 @@ class LocacaoController extends Controller
             'locacao' => $assinatura->locacao,
             'cliente' => $assinatura->locacao?->cliente,
             'jaAssinado' => $assinatura->status === 'assinado' && !empty($assinatura->assinatura_cliente_url),
+            'assinaturaClienteSrc' => $this->resolverAssinaturaClienteParaTela($assinatura),
             'tipoDocumento' => $tipoDocumento,
             'idModeloDocumento' => $idModeloDocumento,
         ]);
@@ -6948,10 +6953,23 @@ class LocacaoController extends Controller
             return redirect()->back()->withInput()->with('error', 'Informe uma assinatura válida para continuar.');
         }
 
-        $urlAssinatura = $this->enviarAssinaturaClienteParaApi($conteudo, $nomeArquivo, (int) $assinatura->id_empresa, $mimeType);
+        try {
+            $assinaturaArmazenada = $this->assinaturaClienteStorageService->store(
+                $conteudo,
+                $nomeArquivo,
+                (int) $assinatura->id_empresa,
+                (int) $assinatura->id_locacao,
+                $mimeType
+            );
+        } catch (\Throwable $e) {
+            Log::error('Erro ao salvar assinatura privada do cliente no disco S3.', [
+                'id_assinatura' => $assinatura->id_assinatura,
+                'id_empresa' => $assinatura->id_empresa,
+                'id_locacao' => $assinatura->id_locacao,
+                'erro' => $e->getMessage(),
+            ]);
 
-        if (!$urlAssinatura) {
-            return redirect()->back()->withInput()->with('error', 'Não foi possível salvar a assinatura no servidor de arquivos.');
+            return redirect()->back()->withInput()->with('error', 'Não foi possível salvar a assinatura no armazenamento configurado.');
         }
 
         // Gerar hash jurídico para validade do documento
@@ -6971,7 +6989,7 @@ class LocacaoController extends Controller
         $assinatura->update([
             'status' => 'assinado',
             'assinatura_tipo' => (string) $request->input('assinatura_tipo'),
-            'assinatura_cliente_url' => $urlAssinatura,
+            'assinatura_cliente_url' => $assinaturaArmazenada,
             'assinado_em' => $dataAceite,
             'ip_assinatura' => $request->ip(),
             'user_agent' => substr((string) $request->userAgent(), 0, 1900),
@@ -7003,7 +7021,7 @@ class LocacaoController extends Controller
             'ip_aceite' => $request->ip(),
             'user_agent' => substr((string) $request->userAgent(), 0, 500),
             'token' => $token,
-            'assinatura_cliente_url' => $urlAssinatura,
+            'assinatura_cliente_url' => $assinaturaArmazenada,
             'corpo_contrato_assinado' => $corpoContratoAssinado,
         ], JSON_UNESCAPED_UNICODE);
         
@@ -7150,11 +7168,32 @@ class LocacaoController extends Controller
 
         return view('locacoes.contrato-assinado', [
             'assinatura' => $assinatura,
+            'assinaturaClienteSrc' => $this->resolverAssinaturaClienteParaTela($assinatura),
             'locacao' => $locacao,
             'cliente' => $cliente,
             'empresa' => $empresa,
             'logoSrc' => $logoSrc,
         ]);
+    }
+
+    public function exibirAssinaturaClientePrivada(LocacaoAssinaturaDigital $assinatura)
+    {
+        $idEmpresa = session('id_empresa') ?? Auth::user()->id_empresa ?? null;
+
+        if ((int) $assinatura->id_empresa !== (int) $idEmpresa) {
+            abort(404);
+        }
+
+        $arquivo = $this->assinaturaClienteStorageService->readPrivateBinary((string) $assinatura->assinatura_cliente_url);
+
+        if (!$arquivo) {
+            abort(404);
+        }
+
+        return response($arquivo['content'])
+            ->header('Content-Type', $arquivo['mime'])
+            ->header('Content-Disposition', 'inline; filename="' . basename((string) $arquivo['path']) . '"')
+            ->header('Cache-Control', 'private, max-age=300');
     }
 
     /**
@@ -7214,6 +7253,11 @@ class LocacaoController extends Controller
 
         $assinaturaClienteUrl = trim((string) ($assinatura->assinatura_cliente_url ?? ''));
         if ($assinaturaClienteUrl === '') {
+            return false;
+        }
+
+        $assinaturaClienteSrc = $this->resolverAssinaturaClienteParaPdf($assinaturaClienteUrl);
+        if (!empty($assinaturaClienteSrc) && stripos($htmlContrato, $assinaturaClienteSrc) !== false) {
             return false;
         }
 
@@ -7612,40 +7656,18 @@ class LocacaoController extends Controller
 
     private function resolverAssinaturaClienteParaPdf(?string $assinaturaUrl): ?string
     {
-        $assinaturaUrl = trim((string) $assinaturaUrl);
+        return LocacaoAssinaturaClienteStorageService::resolveInlineSource($assinaturaUrl);
+    }
+
+    private function resolverAssinaturaClienteParaTela(LocacaoAssinaturaDigital $assinatura): ?string
+    {
+        $assinaturaUrl = trim((string) ($assinatura->assinatura_cliente_url ?? ''));
+
         if ($assinaturaUrl === '') {
             return null;
         }
 
-        $assinaturaUrl = str_replace(['https//', 'http//'], ['https://', 'http://'], $assinaturaUrl);
-
-        // Tenta resolver arquivo local no servidor (assinaturas e storage)
-        $arquivoLocal = $this->resolverArquivoLocalParaPdf($assinaturaUrl, [
-            'assets/assinaturas-contrato',
-            'storage/assinaturas',
-            'assets/assinaturas',
-        ]);
-        if ($arquivoLocal !== null) {
-            return $arquivoLocal;
-        }
-
-        // Fallback: tenta resolver via URL remota convertendo para base64
-        if (str_starts_with($assinaturaUrl, 'http://') || str_starts_with($assinaturaUrl, 'https://')) {
-            try {
-                $response = Http::timeout(20)->get($assinaturaUrl);
-                if ($response->successful()) {
-                    $mime = (string) ($response->header('Content-Type') ?: 'image/png');
-                    return 'data:' . $mime . ';base64,' . base64_encode((string) $response->body());
-                }
-            } catch (\Throwable $e) {
-                Log::warning('Falha ao resolver assinatura do cliente para PDF.', [
-                    'url' => $assinaturaUrl,
-                    'erro' => $e->getMessage(),
-                ]);
-            }
-        }
-
-        return $assinaturaUrl;
+        return LocacaoAssinaturaClienteStorageService::resolveInlineSource($assinaturaUrl);
     }
 
     /**
