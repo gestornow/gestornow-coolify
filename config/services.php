@@ -86,6 +86,13 @@ return [
         'timeout' => env('MERCADO_PAGO_TIMEOUT', 60),
     ],
 
+    
+    'cobli' => [
+        'api_key' => env('COBLI_API_KEY', ''),
+        'base_url' => env('COBLI_BASE_URL', 'https://api.cobli.co'),
+        'timeout' => env('COBLI_TIMEOUT', 30),
+    ],
+
     'paghiper' => [
         'api_key' => env('PAGHIPER_API_KEY', ''),
         'token' => env('PAGHIPER_TOKEN', ''),
