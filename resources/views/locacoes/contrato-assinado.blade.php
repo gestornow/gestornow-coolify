@@ -476,8 +476,8 @@
 
         <!-- Área de Assinatura -->
         <div class="assinatura-area">
-            @if(!empty($assinatura->assinatura_cliente_url))
-            <img src="{{ $assinatura->assinatura_cliente_url }}" alt="Assinatura" class="assinatura-imagem">
+            @if(!empty($assinaturaClienteSrc ?? null))
+            <img src="{{ $assinaturaClienteSrc }}" alt="Assinatura" class="assinatura-imagem">
             @endif
             <div class="assinatura-linha">
                 <div class="assinatura-nome">{{ $assinatura->assinado_por_nome ?? $cliente->nome ?? 'Locatário' }}</div>

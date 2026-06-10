@@ -47,9 +47,9 @@
                     <br><small>Assinado em: {{ $assinatura->assinado_em->format('d/m/Y H:i:s') }}</small>
                     @endif
                 </div>
-                @if(!empty($assinatura->assinatura_cliente_url))
+                @if(!empty($assinaturaClienteSrc ?? null))
                     <div class="text-center p-3 border rounded bg-white mb-3">
-                        <img src="{{ $assinatura->assinatura_cliente_url }}" alt="Assinatura" style="max-width: 100%; max-height: 180px;">
+                        <img src="{{ $assinaturaClienteSrc }}" alt="Assinatura" style="max-width: 100%; max-height: 180px;">
                     </div>
                 @endif
                 <div class="d-flex gap-2 flex-wrap">

@@ -798,6 +798,7 @@ Route::middleware(['simple.auth', 'verify.unique.session', 'verificar.empresa', 
         Route::get('/buscar-produtos-terceiros', [\App\Http\Controllers\Locacao\LocacaoController::class, 'buscarProdutosTerceiros'])->name('locacoes.buscar-produtos-terceiros')->middleware('perm:locacoes.visualizar');
         Route::get('/documentos', [\App\Http\Controllers\Locacao\LocacaoController::class, 'modelosContrato'])->name('locacoes.documentos')->middleware('perm:locacoes.visualizar');
         Route::get('/modelos-contrato', [\App\Http\Controllers\Locacao\LocacaoController::class, 'modelosContrato'])->name('locacoes.modelos-contrato')->middleware('perm:locacoes.visualizar');
+        Route::get('/assinaturas-digitais/{assinatura}/cliente-arquivo', [\App\Http\Controllers\Locacao\LocacaoController::class, 'exibirAssinaturaClientePrivada'])->name('locacoes.assinaturas-digitais.cliente-arquivo')->middleware('perm:locacoes.visualizar');
         Route::get('/{locacao}/logs-atividades', [\App\Http\Controllers\Locacao\LocacaoController::class, 'logsAtividades'])->name('locacoes.logs-atividades')->middleware('perm:locacoes.visualizar');
         Route::get('/{locacao}/edit', [\App\Http\Controllers\Locacao\LocacaoController::class, 'edit'])->name('locacoes.edit')->middleware('perm:locacoes.editar');
         Route::delete('/{locacao}/itens/{produtoLocacao}', [\App\Http\Controllers\Locacao\LocacaoController::class, 'removerItemProduto'])->name('locacoes.remover-item-produto')->middleware('perm:locacoes.editar');
