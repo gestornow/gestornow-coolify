@@ -920,4 +920,19 @@ Route::middleware(['simple.auth', 'verify.unique.session', 'verificar.empresa', 
         Route::delete('/{id}', [\App\Http\Controllers\Financeiro\FormaPagamentoController::class, 'destroy'])->name('formas-pagamento.destroy');
     });
 
+    // ==============================================================
+    // ROTAS PARA ARQUIVOS PRIVADOS (R2 Storage)
+    // ==============================================================
+    Route::prefix('arquivos-privados')->group(function () {
+        Route::get('/download/{path}', [\App\Http\Controllers\ArquivoPrivadoController::class, 'download'])
+            ->name('arquivos-privados.download')
+            ->where('path', '.+');
+        Route::get('/stream/{path}', [\App\Http\Controllers\ArquivoPrivadoController::class, 'stream'])
+            ->name('arquivos-privados.stream')
+            ->where('path', '.+');
+        Route::get('/url-temporaria/{path}', [\App\Http\Controllers\ArquivoPrivadoController::class, 'urlTemporaria'])
+            ->name('arquivos-privados.url-temporaria')
+            ->where('path', '.+');
+    });
+
 }); // Fim do grupo de rotas protegidas
