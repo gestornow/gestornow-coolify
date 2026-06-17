@@ -243,6 +243,29 @@ Documentação e decisões arquiteturais estão em [`docs/`](docs/):
 
 ---
 
+## Cloudflare R2 no Coolify
+
+O projeto já possui suporte a disco S3 e agora inclui disco dedicado `r2` em `config/filesystems.php`.
+Para usar um bucket R2 já existente no deploy via Coolify, configure as variáveis abaixo:
+
+```env
+FILESYSTEM_DISK=r2
+R2_ACCESS_KEY_ID=
+R2_SECRET_ACCESS_KEY=
+R2_DEFAULT_REGION=auto
+R2_BUCKET=
+R2_ENDPOINT=https://<ACCOUNT_ID>.r2.cloudflarestorage.com
+R2_URL=
+R2_USE_PATH_STYLE_ENDPOINT=false
+```
+
+Notas:
+- `R2_URL` é opcional, mas recomendado quando você usa domínio público/custom domain para servir arquivos.
+- Se preferir, você pode continuar usando `s3` com as variáveis `AWS_*`; o disco `r2` também aceita fallback para elas.
+- Bucket já criado: basta apontar as variáveis e redeployar no Coolify.
+
+---
+
 ## Licença
 
 MIT License — Copyright (c) 2026 gestornow. Veja o arquivo [LICENSE](LICENSE) para detalhes.
